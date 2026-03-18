@@ -46,7 +46,7 @@ export function CreateLinkForm({ deckId }: { deckId: string }) {
       <div className="space-y-3">
         <div>
           <label className="text-xs text-gray-500 mb-1 block">
-            Label <span className="text-gray-400">(e.g. "Sequoia", "a16z")</span>
+            Label <span className="text-gray-400">(e.g. &ldquo;Sequoia&rdquo;, &ldquo;a16z&rdquo;)</span>
           </label>
           <input
             type="text"

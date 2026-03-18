@@ -32,7 +32,7 @@ export function EmailGate({ slug, deckTitle }: Props) {
           <span className="text-3xl font-bold text-white tracking-tight">
             kinnect<span className="text-brand-accent">.</span>
           </span>
-          <p className="mt-1 text-white/60 text-sm">You've been invited to view</p>
+          <p className="mt-1 text-white/60 text-sm">You&apos;ve been invited to view</p>
           <p className="mt-2 text-white font-semibold text-lg">{deckTitle}</p>
         </div>
 
@@ -72,7 +72,7 @@ export function EmailGate({ slug, deckTitle }: Props) {
         </form>
 
         <p className="text-center text-xs text-white/30">
-          Your email is only used to notify the sender. We won't spam you.
+          Your email is only used to notify the sender. We won&apos;t spam you.
         </p>
       </div>
     </div>
