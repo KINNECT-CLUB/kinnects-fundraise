@@ -35,10 +35,6 @@ export function SlideHeatmap({ slideStats }: Props) {
   }));
 
   function getColor(intensity: number): string {
-    // Low engagement: light gray → high engagement: brand accent
-    const r = Math.round(233 * (1 - intensity) + 233 * intensity);
-    const g = Math.round(233 * (1 - intensity) + 69 * intensity);
-    const b = Math.round(233 * (1 - intensity) + 96 * intensity);
     // Map 0→#E9E9E9 to 1→#E94560 (brand accent)
     const lerp = (a: number, b: number, t: number) => Math.round(a + (b - a) * t);
     return `rgb(${lerp(233, 233, intensity)}, ${lerp(233, 69, intensity)}, ${lerp(233, 96, intensity)})`;
