@@ -9,15 +9,16 @@ import { CreateLinkForm } from "./CreateLinkForm";
 import { Copy, Eye, Clock, CheckCircle } from "lucide-react";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function DeckDetailPage({ params }: Props) {
   const session = await auth();
   const userId = session!.user!.id!;
+  const { id } = await params;
 
   const deck = await db.pitchDeck.findFirst({
-    where: { id: params.id, ownerId: userId },
+    where: { id, ownerId: userId },
     include: {
       links: {
         include: {
