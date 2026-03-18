@@ -171,7 +171,7 @@ export function DeckViewer({ linkId, deck, viewerEmail, viewerName }: Props) {
                 Kinnect is built for families.
               </h2>
               <p className="text-white/60 text-sm leading-relaxed">
-                We're making it easy for families to stay connected, share
+                We&apos;re making it easy for families to stay connected, share
                 memories, and grow together — privately and beautifully.
                 Join thousands of families already on Kinnect.
               </p>
@@ -183,7 +183,7 @@ export function DeckViewer({ linkId, deck, viewerEmail, viewerName }: Props) {
                 rel="noopener noreferrer"
                 className="w-full inline-flex items-center justify-center gap-2 h-11 px-8 rounded-md bg-brand-accent text-white font-medium text-sm hover:bg-brand-accent/90 transition-colors"
               >
-                Join Kinnect — it's free
+                Join Kinnect — it&apos;s free
                 <ArrowRight className="h-4 w-4" />
               </a>
               <button
@@ -194,7 +194,7 @@ export function DeckViewer({ linkId, deck, viewerEmail, viewerName }: Props) {
               </button>
             </div>
             <p className="text-xs text-white/30">
-              You've seen what we're building. Come be part of it.
+              You&apos;ve seen what we&apos;re building. Come be part of it.
             </p>
           </div>
         </div>
