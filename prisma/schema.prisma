@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String      @id @default(cuid())
+  name          String?
+  email         String?     @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  pitchDecks    PitchDeck[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+// ─── Pitch Deck ───────────────────────────────────────────────────────────────
+
+enum PitchDeckStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+model PitchDeck {
+  id          String          @id @default(cuid())
+  ownerId     String
+  owner       User            @relation(fields: [ownerId], references: [id])
+  title       String
+  description String?
+  slideCount  Int             @default(0)
+  fileUrl     String          // GCS/S3 signed URL or public URL of the PDF
+  fileName    String
+  status      PitchDeckStatus @default(DRAFT)
+  links       PitchDeckLink[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum PitchDeckLinkStatus {
+  ACTIVE
+  DISABLED
+  EXPIRED
+}
+
+model PitchDeckLink {
+  id           String              @id @default(cuid())
+  pitchDeckId  String
+  pitchDeck    PitchDeck           @relation(fields: [pitchDeckId], references: [id])
+  slug         String              @unique
+  // Human label so owner can tell links apart (e.g. "Sequoia", "a16z")
+  label        String?
+  requireEmail Boolean             @default(true)
+  passwordHash String?
+  expiresAt    DateTime?
+  maxViews     Int?
+  status       PitchDeckLinkStatus @default(ACTIVE)
+  views        PitchDeckView[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([slug])
+}
+
+model PitchDeckView {
+  id                   String              @id @default(cuid())
+  linkId               String
+  link                 PitchDeckLink       @relation(fields: [linkId], references: [id])
+  viewerEmail          String?
+  viewerName           String?
+  startedAt            DateTime            @default(now())
+  endedAt              DateTime?
+  totalDurationSeconds Int                 @default(0)
+  ipAddress            String?
+  userAgent            String?
+  completed            Boolean             @default(false)
+  slideViews           PitchDeckSlideView[]
+  createdAt            DateTime            @default(now())
+
+  @@index([linkId])
+  @@index([viewerEmail])
+}
+
+model PitchDeckSlideView {
+  id               String        @id @default(cuid())
+  viewId           String
+  view             PitchDeckView @relation(fields: [viewId], references: [id])
+  slideIndex       Int           // 1-based
+  firstViewedAt    DateTime      @default(now())
+  lastHeartbeatAt  DateTime      @default(now())
+  durationSeconds  Int           @default(0)
+  visitCount       Int           @default(1)
+
+  @@unique([viewId, slideIndex])
+  @@index([viewId])
+}
