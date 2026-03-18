@@ -1,19 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 
-/**
- * POST /api/admin/decks
- * Accepts a multipart/form-data body with:
- *   - file: PDF binary
- *   - title: string
- *   - description?: string
- *
- * Counts pages via pdfjs-dist and stores the file URL.
- * In production, replace the local /tmp write with an upload to GCS/S3
- * and use the resulting signed URL as fileUrl.
- */
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -31,9 +21,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "File exceeds 50 MB limit" }, { status: 413 });
   }
 
-  // Count pages
   const arrayBuffer = await file.arrayBuffer();
   const uint8 = new Uint8Array(arrayBuffer);
+
   let slideCount = 0;
   try {
     const pdf = await getDocument({ data: uint8 }).promise;
@@ -42,16 +32,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not parse PDF" }, { status: 422 });
   }
 
-  // ──────────────────────────────────────────────────────────────────────────
-  // TODO: replace with actual GCS/S3 upload.
-  // Example (GCS):
-  //   const storage = new Storage();
-  //   const bucket = storage.bucket(process.env.STORAGE_BUCKET!);
-  //   const blob = bucket.file(`decks/${userId}/${Date.now()}-${file.name}`);
-  //   await blob.save(Buffer.from(arrayBuffer), { contentType: "application/pdf" });
-  //   const [fileUrl] = await blob.getSignedUrl({ action: "read", expires: "2099-01-01" });
-  // ──────────────────────────────────────────────────────────────────────────
-  const fileUrl = `https://storage.googleapis.com/${process.env.STORAGE_BUCKET}/placeholder/${Date.now()}.pdf`;
+  const blob = await put(`decks/${session.user!.id}/${Date.now()}-${file.name}`, file, {
+    access: "public",
+    contentType: "application/pdf",
+  });
 
   const deck = await db.pitchDeck.create({
     data: {
@@ -59,7 +43,7 @@ export async function POST(req: NextRequest) {
       title,
       description,
       slideCount,
-      fileUrl,
+      fileUrl: blob.url,
       fileName: file.name,
       status: "ACTIVE",
     },
