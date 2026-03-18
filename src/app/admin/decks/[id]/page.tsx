@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatDuration } from "@/lib/utils";
 import { SlideHeatmap } from "./SlideHeatmap";
 import { CreateLinkForm } from "./CreateLinkForm";
-import { Copy, Eye, Clock, CheckCircle } from "lucide-react";
+import { Eye, Clock, CheckCircle } from "lucide-react";
+import { CopyButton } from "./CopyButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -171,15 +172,3 @@ function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string
   );
 }
 
-function CopyButton({ text }: { text: string }) {
-  return (
-    <button
-      onClick={undefined} // handled client-side via the client component below
-      data-copy={text}
-      className="copy-btn p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
-      title="Copy link"
-    >
-      <Copy className="h-4 w-4" />
-    </button>
-  );
-}
