@@ -36,6 +36,7 @@ Fill in the values in `.env.local`:
 |---|---|
 | `DATABASE_URL` | PostgreSQL connection string (e.g. [Neon](https://neon.tech) free tier) |
 | `AUTH_SECRET` | Random secret — generate with `openssl rand -base64 32` |
+| `AUTH_URL` | Your deployed app URL — must match the redirect URI registered in Google Cloud Console (e.g. `https://your-app.vercel.app`) |
 | `AUTH_GOOGLE_ID` | Google OAuth client ID |
 | `AUTH_GOOGLE_SECRET` | Google OAuth client secret |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token (auto-filled when linked in Vercel dashboard) |
