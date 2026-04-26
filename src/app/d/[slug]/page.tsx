@@ -5,13 +5,14 @@ import { EmailGate } from "./EmailGate";
 import { DeckViewer } from "./DeckViewer";
 
 interface Props {
-  params: { slug: string };
-  searchParams: { email?: string; name?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ email?: string; name?: string }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   const link = await db.pitchDeckLink.findUnique({
-    where: { slug: params.slug },
+    where: { slug: slug },
     include: { pitchDeck: true },
   });
 
@@ -37,8 +38,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DeckPage({ params, searchParams }: Props) {
+  const { slug } = await params;
+  const { email, name } = await searchParams;
+
   const link = await db.pitchDeckLink.findUnique({
-    where: { slug: params.slug },
+    where: { slug: slug },
     include: { pitchDeck: true },
   });
 
@@ -49,9 +53,9 @@ export default async function DeckPage({ params, searchParams }: Props) {
   }
 
   // If email gate is required and email not yet provided, show the gate
-  const viewerEmail = searchParams.email;
+  const viewerEmail = email;
   if (link.requireEmail && !viewerEmail) {
-    return <EmailGate slug={params.slug} deckTitle={link.pitchDeck.title} />;
+    return <EmailGate slug={slug} deckTitle={link.pitchDeck.title} />;
   }
 
   return (
@@ -63,7 +67,7 @@ export default async function DeckPage({ params, searchParams }: Props) {
         slideCount: link.pitchDeck.slideCount,
       }}
       viewerEmail={viewerEmail}
-      viewerName={searchParams.name}
+      viewerName={name}
     />
   );
 }
