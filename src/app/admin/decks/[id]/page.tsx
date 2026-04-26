@@ -14,12 +14,13 @@ interface Props {
 }
 
 export default async function DeckDetailPage({ params }: Props) {
+  const { id } = await params;
   const session = await auth();
   const userId = session!.user!.id!;
   const { id } = await params;
 
   const deck = await db.pitchDeck.findFirst({
-    where: { id, ownerId: userId },
+    where: { id: id, ownerId: userId },
     include: {
       links: {
         include: {
