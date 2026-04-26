@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
@@ -32,22 +31,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not parse PDF" }, { status: 422 });
   }
 
-  const blob = await put(`decks/${session.user!.id}/${Date.now()}-${file.name}`, file, {
-    access: "public",
-    contentType: "application/pdf",
-  });
-
-  const deck = await db.pitchDeck.create({
-    data: {
-      ownerId: session.user!.id!,
-      title,
-      description,
-      slideCount,
-      fileUrl: blob.url,
-      fileName: file.name,
-      status: "ACTIVE",
-    },
-  });
-
-  return NextResponse.json(deck, { status: 201 });
+  // TODO: Implement storage provider (S3, GCS, or local storage)
+  // Since Vercel Blob is removed, we return an error until a new provider is configured.
+  return NextResponse.json(
+    { error: "Storage provider not configured. Please implement a file upload solution." },
+    { status: 501 }
+  );
 }
